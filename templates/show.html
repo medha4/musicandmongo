@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>Song Titles</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    </head>
+    <body>
+      <h1>Song Title</h1>
+      <div class="song-list">
+        <ul>
+          {% for m in music %}
+            <li><a href = 'song/{{m._id}}'> {{ m.song }} - {{ m.artist }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <button type="button" class="btn btn-danger"><a style = 'text-decoration: none; color:white;' href = '{{ url_for('index') }}'>Go Home</a></button>
+    </body>
+</html>
