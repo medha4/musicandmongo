@@ -5,6 +5,7 @@
     </head>
     <body>
       <h1>Song Title</h1>
+        <!-- {% if session['username'] %} -->
       <div class="song-list">
         <ul>
           {% for m in music %}
@@ -13,5 +14,8 @@
         </ul>
       </div>
       <button type="button" class="btn btn-danger"><a style = 'text-decoration: none; color:white;' href = '{{ url_for('index') }}'>Go Home</a></button>
+        <!-- {% else %}
+        <a href = '{{ url_for('logintomongo') }}'>Log In </a>
+        {% endif %} -->
     </body>
 </html>

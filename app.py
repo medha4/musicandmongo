@@ -7,7 +7,8 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask import session
 import os
-
+import bcrypt
+from flask import flash
 
 # -- Initialization section --
 app = Flask(__name__)
@@ -83,13 +84,14 @@ def show():
 
 @app.route('/usershow')
 def usershow():
-    if session['username'] != None and len(session['username']) >=1:
-        mus = mongo.db.music
-        musiclist= mus.find({'user':session['username']}).sort("song", 1)
-        # musiclist= mus.find({}).sort("artist", 1)
-        #musiclist= mus.find({})[:3].sort("artist", 1)
-        return render_template("show.html", music=musiclist)
-    else:
+    try: 
+        if session['username'] != None and len(session['username']) >=1:
+            mus = mongo.db.music
+            musiclist= mus.find({'user':session['username']}).sort("song", 1)
+            # musiclist= mus.find({}).sort("artist", 1)
+            #musiclist= mus.find({})[:3].sort("artist", 1)
+            return render_template("show.html", music=musiclist)
+    except:
         return render_template("login.html")
 
 # ADVANCED: A FORM TO COLLECT USER-SUBMITTED SONGS
@@ -103,19 +105,20 @@ def sendSong():
     if request.method == 'GET':
         return "you are getting some info"
     else:
-        if session['username'] != None and len(session['username']) >=1:
-            songName = request.form['song_name']
-            artistName = request.form['artist_name']
-            descrip = request.form['description']
-            music = mongo.db.music
-            music.insert({"song" : songName,
-                    "artist": artistName,
-                    "description": descrip,
-                    "user": session['username']})
-            mus = mongo.db.music
-            musiclist= mus.find({}).sort("song", 1)
-            return render_template("show.html", music=musiclist)
-        else:
+        try:
+            if session['username'] != None and len(session['username']) >=1:
+                songName = request.form['song_name']
+                artistName = request.form['artist_name']
+                descrip = request.form['description']
+                music = mongo.db.music
+                music.insert({"song" : songName,
+                        "artist": artistName,
+                        "description": descrip,
+                        "user": session['username']})
+                mus = mongo.db.music
+                musiclist= mus.find({}).sort("song", 1)
+                return render_template("show.html", music=musiclist)
+        except:
             return render_template("login.html")
 
 
@@ -156,19 +159,18 @@ def login():
 def logintomongo():
     users = mongo.db.users
     given_username = request.form['username']
-    given_password = request.form['password']
+    given_password = bcrypt.hashpw(request.form['password'].encode("utf-8"),bcrypt.gensalt())
+    print(given_password)
     if request.method == 'GET':
         return "you are getting some info"
     else:
         if not list(users.find({'username':given_username})):
-            users.insert({"username" : given_username,"password": given_password})
+            users.insert({"username" : given_username,"password": str(given_password,'utf-8')})
             session['username'] = given_username
-            session['password'] = given_password
             return render_template("template.html")
         else:
-            if list(users.find({'username':given_username}))[0]['password'] == given_password:
+            if list(users.find({'username':given_username}))[0]['password'] == str(given_password,'utf-8'):
                 session['username'] = given_username
-                session['password'] = given_password
                 return render_template('template.html')
             else:
                 session['error'] = "username already taken"
@@ -176,6 +178,6 @@ def logintomongo():
 
 @app.route('/logout')
 def logout():
-    session['username'] = None
-    session['password'] = None
+    # session['username'] = None
+    session.clear()
     return render_template('template.html')
