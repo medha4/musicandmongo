@@ -6,6 +6,7 @@ from flask import request
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask import session
+import os
 
 
 # -- Initialization section --
@@ -16,8 +17,11 @@ app.secret_key = "brunomars"
 # name of database
 app.config['MONGO_DBNAME'] = 'music'
 
+MONGO_USER = os.environ['MONGO_USER']
+MONGO_PASSWORD = os.environ['MONGO_PASSWORD']
+
 # URI of database
-app.config['MONGO_URI'] = 'mongodb+srv://admin2:helloworld@cluster0.4lc7f.mongodb.net/music?retryWrites=true&w=majority'
+app.config['MONGO_URI'] = f'mongodb+srv://{MONGO_USER}:{MONGO_PASSWORD}@cluster0.4lc7f.mongodb.net/music?retryWrites=true&w=majority'
 
 
 
